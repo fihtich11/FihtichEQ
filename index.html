@@ -313,10 +313,10 @@ button { font: inherit; color: inherit; }
 
 .catbar { display: grid; grid-template-columns: 1fr 1fr; grid-template-areas: "c c" "l r"; align-items: center; gap: 12px; margin-top: 18px; }
 .catbar .modes { margin: 0; width: 100%; max-width: 680px; justify-self: center; }
-.cat { display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); font-weight: 700; font-size: .95rem; cursor: pointer; white-space: nowrap; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: color .2s, background .2s, border-color .2s; }
+.cat { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); font-weight: 700; font-size: .85rem; cursor: pointer; white-space: nowrap; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: color .2s, background .2s, border-color .2s; }
 .cat[data-cat="kb2"] { justify-self: start; }
 .cat[data-cat="armor"] { justify-self: end; }
-.cat svg { width: 18px; height: 18px; }
+.cat svg { width: 16px; height: 16px; }
 .cat:hover { color: var(--text); }
 .cat.active { color: var(--text); background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22); }
 @media (max-width: 900px) {
