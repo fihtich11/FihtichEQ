@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>mc-zone.Tiers</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: липкая шапка (лого · поиск · IP) → полоса режимов → общий лидерборд ИЛИ 5 колонок тиров режима */
+:root {
+  --bg-1: #0f0f13;
+  --bg-2: #1a1a24;
+  --panel: rgba(255, 255, 255, 0.04);
+  --panel-2: rgba(255, 255, 255, 0.07);
+  --line: rgba(255, 255, 255, 0.08);
+  --text: #e8e8f0;
+  --muted: #8a8aa0;
+  --accent: #d4d4e0;
+  --on-accent: #0f0f13;
+  --t1: #ffc93c;  --t1b: #ff3b5c;
+  --t2: #a855f7;
+  --t3: #3b82f6;
+  --t4: #22c55e;
+  --t5: #9ca3af;
+  --gold: #ffc93c; --silver: #cbd5e1; --bronze: #d08a52;
+  --radius: 16px;
+  --f-display: 'Orbitron', 'Segoe UI', system-ui, sans-serif;
+  --f-body: 'Inter', system-ui, -apple-system, sans-serif;
+  color-scheme: dark;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  min-height: 100vh;
+  font-family: var(--f-body);
+  color: var(--text);
+  background: var(--bg-1);
+  background: linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 100%) fixed;
+  overflow-x: hidden;
+  padding-block: 0 40px;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px); z-index: 30;
+  background: rgba(15, 15, 19, 0.85);
+}
+.wrap {
+  max-width: 1200px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.bg-glow {
+  position: fixed; width: 520px; height: 520px; max-width: 100vw;
+  border-radius: 50%; filter: blur(120px); opacity: 0.22;
+  z-index: -1; pointer-events: none;
+}
+.bg-glow--1 { background: #7c3aed; top: -150px; left: -150px; }
+
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ===== Шапка ===== */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: rgba(15, 15, 19, 0.75);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--line);
+}
+.topbar__inner { display: flex; align-items: center; gap: 16px; padding-block: 12px; flex-wrap: wrap; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); }
+.logo svg { width: 28px; height: 28px; color: var(--accent); }
+.logo__title { font-family: var(--f-display); font-weight: 800; font-size: 1.35rem; letter-spacing: 1px; }
+.logo__title span { color: var(--muted); }
+
+.search { position: relative; flex: 1 1 260px; min-width: 0; max-width: 420px; margin-left: auto; }
+.search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--muted); pointer-events: none; }
+.search input {
+  width: 100%; padding: 10px 14px 10px 40px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  color: var(--text); font: 500 0.95rem var(--f-body);
+  transition: border-color .2s, box-shadow .2s;
+}
+.search input::placeholder { color: var(--muted); }
+.search input:focus { outline: none; border-color: var(--accent); }
+.search__results {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+  background: #16161f; border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .6); overflow: hidden;
+}
+.search__item {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 9px 12px; background: none; border: none; text-align: left; cursor: pointer;
+}
+.search__item:hover, .search__item.sel { background: var(--panel-2); }
+.search__item small { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+.search__empty { padding: 12px; color: var(--muted); font-size: .9rem; }
+
+.ip-box {
+  display: flex; align-items: center; gap: 8px; padding: 9px 14px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  cursor: pointer; transition: border-color .25s, box-shadow .25s;
+}
+.ip-box:hover { border-color: var(--accent); }
+.ip-box__label { font-size: .68rem; font-weight: 800; letter-spacing: .06em; padding: 2px 6px; border-radius: 6px; background: var(--accent); color: var(--on-accent); }
+.ip-box__value { font-weight: 600; }
+.ip-box svg { width: 16px; height: 16px; color: var(--muted); }
+
+/* ===== Режимы ===== */
+.modes {
+  display: flex; gap: 8px; margin: 22px 0 20px; padding: 6px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  overflow-x: auto; scrollbar-width: none;
+}
+.modes::-webkit-scrollbar { display: none; }
+.mode {
+  flex: 1; min-width: max-content;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 11px 18px; border: none; border-radius: 12px; background: transparent;
+  color: var(--muted); font-weight: 600; font-size: .95rem; cursor: pointer;
+  transition: color .3s, background .3s, box-shadow .3s;
+}
+.mode svg { width: 18px; height: 18px; }
+.mode:hover { color: var(--text); background: rgba(255, 255, 255, .05); }
+.mode.active { color: var(--text); background: rgba(255, 255, 255, .12); }
+
+.view { animation: fadeUp .4s ease both; }
+@keyframes fadeUp { from { opacity: .001; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+.view__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.view__title { font-family: var(--f-display); font-size: clamp(1.2rem, 3.5vw, 1.6rem); font-weight: 800; letter-spacing: .5px; text-wrap: balance; }
+.view__sub { color: var(--muted); font-size: .9rem; margin-top: 4px; }
+.info-btn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  color: var(--muted); font-size: .85rem; font-weight: 600; cursor: pointer;
+}
+.info-btn:hover { color: var(--text); border-color: var(--accent); }
+.info-btn svg { width: 16px; height: 16px; }
+
+/* ===== Аватар ===== */
+.ava { image-rendering: pixelated; border-radius: 6px; flex: none; background: #222; box-shadow: 0 0 0 1px rgba(255,255,255,.08); }
+
+/* ===== Общий рейтинг ===== */
+.board { display: flex; flex-direction: column; gap: 8px; }
+.row {
+  display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: center; gap: 14px;
+  padding: 10px 16px 10px 10px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  cursor: pointer; text-align: left; width: 100%;
+  transition: transform .2s, border-color .2s, box-shadow .2s, background .2s;
+  animation: fadeUp .4s ease both;
+}
+.row:hover { transform: translateX(4px); background: var(--panel-2); border-color: rgba(255, 255, 255, .18); }
+.rank {
+  height: 44px; display: grid; place-items: center;
+  font-family: var(--f-display); font-weight: 800; font-size: 1.1rem; font-variant-numeric: tabular-nums;
+  border-radius: 10px; color: var(--muted); background: rgba(255,255,255,.03);
+}
+.row--1 .rank { color: #1a1300; background: linear-gradient(135deg, #ffe08a, var(--gold));  }
+.row--2 .rank { color: #111; background: linear-gradient(135deg, #f1f5f9, var(--silver)); }
+.row--3 .rank { color: #1a0d00; background: linear-gradient(135deg, #f0b27a, var(--bronze)); }
+.row--1 { border-color: rgba(255, 201, 60, .35); background: linear-gradient(90deg, rgba(255, 201, 60, .08), var(--panel)); }
+
+.who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.who__text { min-width: 0; }
+.who__name { font-weight: 800; font-size: 1.02rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.who__meta { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: .82rem; margin-top: 2px; flex-wrap: wrap; }
+.title-chip { display: inline-flex; align-items: center; gap: 4px; color: var(--tc, var(--muted)); font-weight: 600; }
+.title-chip svg { width: 13px; height: 13px; }
+.pts { font-variant-numeric: tabular-nums; }
+
+.chips { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.chip {
+  --c: var(--t5);
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 8px; border-radius: 9px;
+  background: color-mix(in srgb, var(--c) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+  color: var(--c); font: 800 .74rem var(--f-display); letter-spacing: .03em;
+  white-space: nowrap;
+}
+.chip svg { width: 13px; height: 13px; }
+.chip--none { --c: #4b4b5c; color: #5f5f73; }
+.chip--r { opacity: .65; }
+
+/* ===== Колонки режима ===== */
+.cols { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.col {
+  --c: var(--t5);
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  overflow: hidden; animation: fadeUp .45s ease both;
+}
+.col__head {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--c) 28%, transparent), transparent);
+  border-bottom: 2px solid var(--c);
+}
+.col__name { font-family: var(--f-display); font-weight: 800; font-size: 1.05rem; color: var(--c); text-shadow: 0 0 12px var(--c); display: flex; align-items: center; gap: 6px; }
+.col__name svg { width: 18px; height: 18px; }
+.col__count { color: var(--muted); font-size: .75rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.col--1 { --c: var(--t1); }
+.col--2 { --c: var(--t2); }
+.col--3 { --c: var(--t3); }
+.col--4 { --c: var(--t4); }
+.col--5 { --c: var(--t5); }
+.col__list { display: flex; flex-direction: column; padding: 6px; }
+.pl {
+  display: flex; align-items: center; gap: 9px; width: 100%;
+  padding: 7px 8px; border: none; border-radius: 10px; background: none;
+  cursor: pointer; text-align: left;
+  transition: background .2s, transform .2s;
+}
+.pl:hover { background: var(--panel-2); transform: translateX(3px); }
+.pl__name { flex: 1; min-width: 0; font-weight: 600; font-size: .9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pl__tag {
+  font: 800 .62rem var(--f-display); letter-spacing: .04em;
+  padding: 3px 5px; border-radius: 6px; flex: none;
+}
+.pl__tag--ht { color: var(--c); background: color-mix(in srgb, var(--c) 20%, transparent); box-shadow: 0 0 10px -3px var(--c); }
+.pl__tag--lt { color: var(--muted); background: rgba(255,255,255,.06); }
+.pl--r { opacity: .5; }
+.pl--r .pl__name { text-decoration: line-through; text-decoration-color: rgba(255,255,255,.25); }
+.col__empty { padding: 14px 10px; color: var(--muted); font-size: .85rem; font-style: italic; text-align: center; }
+
+.empty-mode {
+  padding: 48px 20px; text-align: center; color: var(--muted);
+  background: var(--panel); border: 1px dashed var(--line); border-radius: var(--radius);
+  margin-bottom: 14px;
+}
+.empty-mode svg { width: 40px; height: 40px; color: var(--accent); opacity: .7; margin-bottom: 10px; }
+.empty-mode b { display: block; color: var(--text); font-size: 1.05rem; margin-bottom: 4px; }
+
+/* ===== Модалка ===== */
+.modal {
+  position: fixed; inset: 0; z-index: 50;
+  display: grid; place-items: center;
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  background: rgba(5, 5, 10, .7);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  animation: fade .2s ease both;
+}
+@keyframes fade { from { opacity: 0; } }
+.card {
+  position: relative; width: min(440px, 100%); max-height: 100%; overflow-y: auto;
+  background: linear-gradient(160deg, #1b1b27, #121219);
+  border: 1px solid rgba(255, 255, 255, .18); border-radius: 20px;
+  box-shadow: 0 30px 60px rgba(0,0,0,.6);
+  padding: 26px 22px 22px;
+  animation: pop .3s cubic-bezier(.2, 1.3, .4, 1) both;
+}
+@keyframes pop { from { transform: scale(.92); opacity: 0; } }
+.card__close {
+  position: absolute; top: 12px; right: 12px; width: 36px; height: 36px;
+  display: grid; place-items: center; border: none; border-radius: 10px;
+  background: var(--panel); cursor: pointer; color: var(--muted);
+}
+.card__close:hover { color: var(--text); background: var(--panel-2); }
+.card__close svg { width: 18px; height: 18px; }
+.card__top { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
+.card__top .ava { border-radius: 14px; box-shadow: 0 0 0 3px rgba(255,255,255,.12); }
+.card__name { font-family: var(--f-display); font-weight: 800; font-size: 1.35rem; margin-top: 6px; overflow-wrap: anywhere; }
+.card__stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0; }
+.stat { padding: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; text-align: center; }
+.stat__v { font-family: var(--f-display); font-weight: 800; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.stat__l { color: var(--muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; margin-top: 2px; }
+.card__h { color: var(--muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 8px; }
+.mrow { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+.mrow + .mrow { margin-top: 6px; }
+.mrow > svg { width: 18px; height: 18px; color: var(--muted); }
+.mrow > span:not(.chip) { flex: 1; font-weight: 600; }
+.mrow small { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.pts-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.pts-table td { padding: 7px 10px; border-bottom: 1px solid var(--line); }
+.pts-table td:last-child { text-align: right; color: var(--muted); }
+.titles { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; }
+.titles div { display: flex; justify-content: space-between; gap: 10px; font-size: .9rem; }
+.titles small { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* ===== Описание и справка ===== */
+.intro { color: var(--muted); font-size: .95rem; line-height: 1.55; margin-top: 22px; max-width: 70ch; }
+.secs { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-top: 28px; align-items: start; }
+.sec { padding: 22px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+.sec h2 { font-size: 1.25rem; font-weight: 800; margin-bottom: 6px; }
+.sec p { color: var(--muted); font-size: .9rem; line-height: 1.5; margin-bottom: 16px; }
+.lvl { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,.03); font-weight: 700; }
+.lvl + .lvl { margin-top: 8px; }
+.lvl--1 { background: rgba(255,201,60,.14); color: var(--gold); }
+.lvl--2 { background: rgba(203,213,225,.12); color: var(--silver); }
+.lvl--3 { background: rgba(208,138,82,.14); color: var(--bronze); }
+.lvl__n { display: flex; align-items: center; gap: 8px; }
+.lvl__n svg { width: 18px; height: 18px; }
+.lvl__p { display: flex; gap: 6px; }
+.lvl__p b { font-size: .78rem; font-weight: 700; padding: 4px 8px; border-radius: 8px; background: rgba(0,0,0,.28); color: var(--text); font-variant-numeric: tabular-nums; }
+.ttl + .ttl { margin-top: 14px; }
+.ttl__top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.ttl__name { display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--tc); }
+.ttl__name svg { width: 18px; height: 18px; }
+.ttl small { color: var(--muted); font-variant-numeric: tabular-nums; }
+.ttl__bar { height: 6px; border-radius: 99px; background: rgba(0,0,0,.35); margin-top: 6px; overflow: hidden; }
+.ttl__bar i { display: block; height: 100%; border-radius: 99px; background: var(--tc); }
+
+/* ===== Футер ===== */
+.footer { margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--line); text-align: center; color: var(--muted); font-size: .85rem; }
+.links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 12px; }
+.link-btn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+  color: var(--text); text-decoration: none; font-weight: 600; font-size: .88rem;
+  transition: border-color .2s, box-shadow .2s;
+}
+.link-btn:hover { border-color: var(--accent); }
+.link-btn svg { width: 16px; height: 16px; color: var(--accent); }
+
+.toast {
+  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  transform: translate(-50%, 160px); z-index: 60;
+  padding: 12px 22px; border-radius: 12px; white-space: nowrap;
+  background: var(--accent); color: var(--on-accent); font-weight: 700;
+  transition: transform .35s cubic-bezier(.2, 1.4, .4, 1);
+}
+.toast.show { transform: translate(-50%, 0); }
+
+/* ===== Адаптив ===== */
+@media (max-width: 1000px) {
+  .cols { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .topbar__inner { gap: 10px; }
+  .search { order: 3; flex-basis: 100%; max-width: none; }
+  .ip-box { margin-left: auto; padding: 8px 10px; }
+  .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .row { grid-template-columns: 44px minmax(0, 1fr); gap: 10px; }
+  .rank { height: 38px; font-size: .95rem; }
+  .chips { grid-column: 1 / -1; justify-content: flex-start; }
+}
+@media (max-width: 460px) {
+  .cols { grid-template-columns: minmax(0, 1fr); }
+  .ip-box__value { font-size: .85rem; }
+  .logo__title { font-size: 1.15rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-glow bg-glow--1"></div>
+
+<header class="topbar">
+  <div class="wrap topbar__inner">
+    <a class="logo" href="#overall">
+      <i data-lucide="swords"></i>
+      <span class="logo__title">mc-zone<span>.Tiers</span></span>
+    </a>
+    <div class="search">
+      <i data-lucide="search"></i>
+      <input id="search" type="search" placeholder="Найти игрока…" autocomplete="off" aria-label="Поиск игрока">
+      <div class="search__results" id="searchResults" hidden></div>
+    </div>
+    <button class="ip-box" id="ipBox" type="button" title="Скопировать IP">
+      <span class="ip-box__label">IP</span>
+      <span class="ip-box__value" id="ipValue">mc-zone.org</span>
+      <i data-lucide="copy"></i>
+    </button>
+  </div>
+</header>
+
+<div class="wrap">
+  <p class="intro">McZone Tiers — это список лучших игроков в PvP на сервере mc-zone.org. Игроки проходят испытания в игровых режимах, распределяются по уровням от 1 до 5 и попадают в общую таблицу лидеров.</p>
+  <nav class="modes" id="modes" role="tablist"></nav>
+  <main id="content"></main>
+
+  <footer class="footer">
+    <div>© <span id="year"></span> mc-zone.Tiers · тир-лист сервера mc-zone.org от t1exyyy</div>
+    <div class="links">
+      <a class="link-btn" href="https://telegram.me/t1exyyy" target="_blank" rel="noopener"><i data-lucide="user"></i>t1exyyy</a>
+      <a class="link-btn" href="https://telegram.me/gemor_pvp" target="_blank" rel="noopener"><i data-lucide="megaphone"></i>Канал</a>
+      <a class="link-btn" href="https://telegram.me/gemor_pvpBot" target="_blank" rel="noopener"><i data-lucide="life-buoy"></i>Поддержка</a>
+    </div>
+  </footer>
+</div>
+
+<div id="modalRoot"></div>
+<div class="toast" id="toast" role="status">IP скопирован!</div>
+
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+<script>
+/* =====================================================================
+   НАСТРОЙКИ — редактируй здесь
+   ===================================================================== */
+const SERVER_IP = 'mc-zone.org';
+
+// Очки за тир (как на McTiers). Ретайр-тиры (RHT1, RLT2…) дают те же очки.
+const POINTS = { HT1: 60, LT1: 45, HT2: 30, LT2: 20, HT3: 10, LT3: 6, HT4: 4, LT4: 3, HT5: 2, LT5: 1 };
+
+// Звания по сумме очков (от большего к меньшему)
+const TITLES = [
+  { min: 400, name: 'Гранд-мастер боя',  color: '#facc15', icon: 'crown' },
+  { min: 250, name: 'Мастер боя',        color: '#facc15', icon: 'gem' },
+  { min: 100, name: 'Ас боя',            color: '#f472b6', icon: 'flame' },
+  { min: 50,  name: 'Специалист по бою', color: '#c4b5fd', icon: 'swords' },
+  { min: 20,  name: 'Боевой кадет',      color: '#a5b4fc', icon: 'shield' },
+  { min: 10,  name: 'Боевой новичок',    color: '#a5b4fc', icon: 'sparkles' },
+  { min: 0,   name: 'Новичок',           color: '#9ca3af', icon: 'circle' }
+];
+
+// Режимы и тиры игроков. Просто вписывай ники в нужный тир.
+// R-тиры (RHT1, RLT1 …) — ретайр: игрок показан полупрозрачным.
+const MODES = [
+  {
+    id: 'kb2', title: 'KB2 Палки', icon: 'wand',
+    tiers: {
+      HT1: ['Pcevdo', 'He0Cnopumoctb', 'Chepupa'],
+      LT1: ['itzkawaii', 'swight', 'granddroptop351', 'xfobiya'],
+      HT2: ['Ferty1ll', 'parazit', 'Defi', 'lolik34', 'davidkai1', 'milionerpati', 'Spooux', 'ItzKPYLLI1TEJIb', 'Gallar', 'zxwendik', 'lob3ik1', 'x0phett', 'mawe12345', 'last1tauches'],
+      LT2: ['xnomercy', 'zertupko', 'Shul1111', 'GhostyClaw', 'Bendy_Demonik', 'xCrinale', 'Dixa2234', 'roni_Bro8610', 'YK_EVERON', 'npaum', 'SKARLETT_', 'Tamioka_71к'],
+      HT3: ['Makcuph', 'kosmosebet', 'Dher4ik', 'Tyfka24', 'Alk0golik', 'murtik17', 'Derzkiy01', 'Camorodok117', 'itzzvoted', 'Elegant', 'SenatorPandaGL', 'Immorta1', 'GOBLIN9997915', 'boost', 'lordtop1gg', 'Harn1zes', 'ryri999', 'Kram1xk', 'xPrince', 'KowalskiyZ', 'king777king', 'CoolBuffalo2183', 'ItzAnkama', 'Dierassha', 'leonproturbo', 'rattan', 'sahsapro793', 'morall4845', 'Pramiik', 'NefriksRec', 'qhqIh99282'],
+      LT3: ['k7nax', 'angelbeza', 'wdjr', '1NDIVIDUALNOCTb', 'mohop991', 'Iyuhb14', 'tgriches', 'tpehepbkm', 'ZloyLesh1', 'kaserat1', 'imterno', 'mmemdemss', 'mon1xxxz', 'Ckpbltn0stb', 'SPONSORXX', 'XPOMOCOMbI', 'almaz120509'],
+      HT4: ['Marssssik06', 'xazprom', 'cageytvink', 'itzMotexx', 'ItsAzadKing1', 'huqzxcc', 'goblinik', 'ronnan13'],
+      LT4: ['SOSALDO', 'folkfok123', 'LerFlayarF8', 'Diferqq', 'v0r10rxd', 'kwistix', 'Sekdu', 'sulfr1k'],
+      HT5: ['villa20', 'Kamera_men_vip', 'rcvhvh3'],
+      LT5: ['0RHH0', 'Nitroid19', 'Sounpaiz2987', 'VexedAcron71627'],
+      RHT1: ['N1ck154', 'Extremerozz', 'SonicLive67', 'ropzs', 'AntrIm78'],
+      RLT1: ['Chezik_', 'wekrona', 'DozzaHub', 'Dutiqwip24', 'Sonixxxahn69', 'heicer', 'Z1LIAR', 'fihtich', 'kvantym544', 'ger01n'],
+      RHT2: ['Sait671616266262', 'Poludurok'],
+      RLT2: ['mawe12345', 'ggtoporik', 'akki4ka', 'soobscurity', 'posedet', 'xpolner', 'murka1', 'CUBERENITET', 'truekoto', 'whalesk197767']
+    }
+  },
+  { id: 'armor', title: 'Фулл Сеты', icon: 'shield', tiers: {} },
+  { id: 'bows',  title: 'Луки',      icon: 'target', tiers: {} }
+];
+
+/* =====================================================================
+   ЛОГИКА
+   ===================================================================== */
+const TIER_ORDER = ['HT1', 'LT1', 'HT2', 'LT2', 'HT3', 'LT3', 'HT4', 'LT4', 'HT5', 'LT5'];
+const TIER_COLOR = n => ['', 'var(--t1)', 'var(--t2)', 'var(--t3)', 'var(--t4)', 'var(--t5)'][n];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const $ = id => document.getElementById(id);
+
+// Для каждого игрока и режима храним лучший действующий (act) и лучший ретайр (ret) тир
+const players = new Map();
+MODES.forEach(mode => {
+  Object.entries(mode.tiers).forEach(([key, names]) => {
+    const retired = key.startsWith('R');
+    const tier = retired ? key.slice(1) : key;
+    if (!POINTS[tier]) return;
+    names.forEach(name => {
+      const id = name.toLowerCase();
+      if (!players.has(id)) players.set(id, { name, src: {} });
+      const e = players.get(id).src[mode.id] ||= { act: null, ret: null };
+      const k = retired ? 'ret' : 'act';
+      if (!e[k] || POINTS[tier] > POINTS[e[k]]) e[k] = tier;
+    });
+  });
+});
+
+// Три топа: действующие тиры / ретайр / всё время (лучший тир в каждом режиме)
+const VIEWS = [
+  { id: 'active',  title: 'Актуальный',   sub: 'только действующие тиры', pick: e => e.act ? { tier: e.act, retired: false } : null },
+  { id: 'retired', title: 'Retired',      sub: 'ретайрнутые тиры', pick: e => e.ret ? { tier: e.ret, retired: true } : null },
+  { id: 'all',     title: 'За всё время', sub: 'лучший тир в каждом режиме за всё время', pick: e =>
+      e.act && e.ret ? (POINTS[e.ret] > POINTS[e.act] ? { tier: e.ret, retired: true } : { tier: e.act, retired: false })
+      : e.act ? { tier: e.act, retired: false } : e.ret ? { tier: e.ret, retired: true } : null }
+];
+const rankings = {};
+VIEWS.forEach(v => {
+  rankings[v.id] = [...players.values()].map(p => {
+    const modes = {};
+    Object.entries(p.src).forEach(([mid, e]) => { const m = v.pick(e); if (m) modes[mid] = m; });
+    const points = Object.values(modes).reduce((sum, m) => sum + POINTS[m.tier], 0);
+    return { name: p.name, modes, points, title: TITLES.find(t => points >= t.min) };
+  }).filter(p => Object.keys(p.modes).length)
+    .sort((x, y) => y.points - x.points || x.name.localeCompare(y.name))
+    .map((p, i) => ({ ...p, rank: i + 1 }));
+});
+
+// Пиксельная «голова» игрока, сгенерированная из ника
+const avaCache = {};
+function avatar(name) {
+  if (avaCache[name]) return avaCache[name];
+  let h = 2166136261;
+  for (const ch of name) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+  const rnd = () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 1000) / 1000; };
+  const skins = ['#f5c6a5', '#e0ac69', '#c68642', '#8d5524', '#ffdbac', '#7ec8a0', '#9aa7ff'];
+  const hairs = ['#2b1a0f', '#4a2c17', '#d9a441', '#111', '#7a1f1f', '#e6e6e6', '#3b6fd8', '#6d2fb8', '#1f7a3a'];
+  const eyes = ['#3b82f6', '#22c55e', '#6b4226', '#a855f7', '#00e5ff', '#ff3b5c'];
+  const skin = skins[Math.floor(rnd() * skins.length)];
+  const hair = hairs[Math.floor(rnd() * hairs.length)];
+  const eye = eyes[Math.floor(rnd() * eyes.length)];
+  const c = document.createElement('canvas'); c.width = c.height = 8;
+  const x = c.getContext('2d');
+  const px = (cx, cy, col) => { x.fillStyle = col; x.fillRect(cx, cy, 1, 1); };
+  x.fillStyle = skin; x.fillRect(0, 0, 8, 8);
+  const hairRows = 1 + Math.floor(rnd() * 2);
+  x.fillStyle = hair; x.fillRect(0, 0, 8, hairRows);
+  for (let i = 0; i < 8; i++) if (rnd() > .55) px(i, hairRows, hair);
+  if (rnd() > .4) { x.fillRect(0, 0, 1, 4 + Math.floor(rnd() * 3)); x.fillRect(7, 0, 1, 4 + Math.floor(rnd() * 3)); }
+  px(1, 4, '#fff'); px(2, 4, eye); px(5, 4, eye); px(6, 4, '#fff');
+  x.fillStyle = 'rgba(0,0,0,.18)'; x.fillRect(3, 5, 2, 1);
+  const mouth = rnd() > .5 ? '#6b2e2e' : 'rgba(0,0,0,.35)';
+  x.fillStyle = mouth; x.fillRect(2 + Math.floor(rnd() * 2), 6, 3, 1);
+  if (rnd() > .7) { x.fillStyle = hair; x.fillRect(1, 7, 6, 1); }
+  return (avaCache[name] = c.toDataURL());
+}
+const ava = (name, size) => `<img class="ava" src="${avatar(name)}" width="${size}" height="${size}" alt="">`;
+
+function chip(mode, m) {
+  if (!m) return `<span class="chip chip--none" title="${esc(mode.title)}: нет тира"><i data-lucide="${mode.icon}"></i>—</span>`;
+  const n = m.tier.slice(2);
+  return `<span class="chip${m.retired ? ' chip--r' : ''}" style="--c:${TIER_COLOR(n)}" title="${esc(mode.title)}">
+    <i data-lucide="${mode.icon}"></i>${m.retired ? 'R' : ''}${m.tier}</span>`;
+}
+const titleChip = t => `<span class="title-chip" style="--tc:${t.color}"><i data-lucide="${t.icon}"></i>${t.name}</span>`;
+
+/* ---------- Переключатель топов ---------- */
+let currentView = VIEWS[0];
+VIEWS.forEach(v => {
+  const btn = document.createElement('button');
+  btn.className = 'mode'; btn.type = 'button'; btn.dataset.id = v.id;
+  btn.setAttribute('role', 'tab');
+  btn.innerHTML = `<span>${esc(v.title)}</span>`;
+  btn.onclick = () => { location.hash = v.id; };
+  $('modes').appendChild(btn);
+});
+
+function route() {
+  currentView = VIEWS.find(v => v.id === location.hash.slice(1)) || VIEWS[0];
+  document.querySelectorAll('.mode').forEach(btn => {
+    const on = btn.dataset.id === currentView.id;
+    btn.classList.toggle('active', on); btn.setAttribute('aria-selected', on);
+  });
+  $('content').innerHTML = renderBoard();
+  window.lucide?.createIcons();
+}
+
+/* ---------- Таблица лидеров ---------- */
+function renderBoard() {
+  const list = rankings[currentView.id];
+  const rows = list.map((p, i) => `
+    <button class="row row--${p.rank}" type="button" data-player="${esc(p.name.toLowerCase())}" style="animation-delay:${Math.min(i, 20) * 25}ms">
+      <div class="rank">${p.rank}</div>
+      <div class="who">
+        ${ava(p.name, 40)}
+        <div class="who__text">
+          <div class="who__name">${esc(p.name)}</div>
+          <div class="who__meta">${titleChip(p.title)}<span class="pts">${p.points} очк.</span></div>
+        </div>
+      </div>
+      <div class="chips">${MODES.map(m => chip(m, p.modes[m.id])).join('')}</div>
+    </button>`).join('');
+  return `<section class="view">
+    <p class="view__sub" style="margin-bottom:12px">${list.length} игроков · ${currentView.sub}</p>
+    <div class="board">${rows || '<div class="empty-mode">В этом топе пока никого нет</div>'}</div>
+    ${infoBlocks()}
+  </section>`;
+}
+
+function infoBlocks() {
+  const lv = [1, 2, 3, 4, 5].map(n => `
+    <div class="lvl lvl--${n}">
+      <span class="lvl__n">${n <= 3 ? '<i data-lucide="trophy"></i>' : ''}Уровень ${n}</span>
+      <span class="lvl__p"><b>HT${n} · ${POINTS['HT' + n]} очк.</b><b>LT${n} · ${POINTS['LT' + n]} очк.</b></span>
+    </div>`).join('');
+  const tt = TITLES.map(t => `
+    <div class="ttl" style="--tc:${t.color}">
+      <div class="ttl__top"><span class="ttl__name"><i data-lucide="${t.icon}"></i>${t.name}</span><small>${t.min ? t.min + '+ очков' : 'Менее 10 очков'}</small></div>
+      <div class="ttl__bar"><i style="width:${Math.max(4, t.min / 4)}%"></i></div>
+    </div>`).join('');
+  return `<div class="secs">
+    <div class="sec"><h2>Уровни и очки</h2>
+      <p>В каждом режиме игроки делятся на пять уровней, а каждый уровень — на высокий (HT) и низкий (LT). Очки за тиры суммируются и определяют место в таблице. Тир с приставкой R (RHT1, RLT1…) — ретайр: очки те же, но такие тиры учитываются в отдельном топе «Retired».</p>
+      ${lv}</div>
+    <div class="sec"><h2>Титулы</h2>
+      <p>Титул зависит от общей суммы очков, набранных во всех режимах.</p>
+      ${tt}</div>
+  </div>`;
+}
+
+/* ---------- Профиль игрока ---------- */
+function openProfile(id) {
+  const base = players.get(id), p = rankings.all.find(x => x.name.toLowerCase() === id);
+  if (!base || !p) return;
+  const rows = MODES.map(m => {
+    const e = base.src[m.id], best = p.modes[m.id];
+    const chips = e
+      ? [e.act && chip(m, { tier: e.act, retired: false }), e.ret && chip(m, { tier: e.ret, retired: true })].filter(Boolean).join('')
+      : chip(m, null);
+    return `<div class="mrow"><i data-lucide="${m.icon}"></i><span>${esc(m.title)}</span>${best ? `<small>${POINTS[best.tier]} очк.</small>` : ''}${chips}</div>`;
+  }).join('');
+  openModal(`
+    <div class="card__top">
+      ${ava(p.name, 96)}
+      <div class="card__name">${esc(p.name)}</div>
+      ${titleChip(p.title)}
+    </div>
+    <div class="card__stats">
+      <div class="stat"><div class="stat__v">#${p.rank}</div><div class="stat__l">Место · всё время</div></div>
+      <div class="stat"><div class="stat__v">${p.points}</div><div class="stat__l">Очки</div></div>
+    </div>
+    <div class="card__h">Тиры по режимам</div>
+    ${rows}`);
+}
+
+function openModal(html) {
+  $('modalRoot').innerHTML = `<div class="modal" id="modal">
+    <div class="card" role="dialog" aria-modal="true">
+      <button class="card__close" type="button" data-close aria-label="Закрыть"><i data-lucide="x"></i></button>${html}
+    </div></div>`;
+  window.lucide?.createIcons();
+  $('modal').querySelector('[data-close]').focus();
+}
+const closeModal = () => { $('modalRoot').innerHTML = ''; };
+
+document.addEventListener('click', e => {
+  const pl = e.target.closest('[data-player]');
+  if (pl) { closeModal(); openProfile(pl.dataset.player); hideResults(); return; }
+  if (e.target.closest('[data-info]')) { openInfo(); return; }
+  if (e.target.closest('[data-close]') || e.target.id === 'modal') closeModal();
+  if (!e.target.closest('.search')) hideResults();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); hideResults(); } });
+
+/* ---------- Поиск ---------- */
+const input = $('search'), results = $('searchResults');
+let matches = [], sel = 0;
+function hideResults() { results.hidden = true; }
+function drawResults() {
+  results.innerHTML = matches.length
+    ? matches.map((p, i) => `<button class="search__item${i === sel ? ' sel' : ''}" type="button" data-player="${esc(p.name.toLowerCase())}">
+        ${ava(p.name, 24)}<span>${esc(p.name)}</span><small>#${p.rank} · ${p.points} очк.</small></button>`).join('')
+    : '<div class="search__empty">Игрок не найден</div>';
+  results.hidden = false;
+}
+input.addEventListener('input', () => {
+  const q = input.value.trim().toLowerCase();
+  if (!q) return hideResults();
+  matches = rankings.all.filter(p => p.name.toLowerCase().includes(q))
+    .sort((a, b) => a.name.toLowerCase().indexOf(q) - b.name.toLowerCase().indexOf(q) || a.rank - b.rank)
+    .slice(0, 8);
+  sel = 0; drawResults();
+});
+input.addEventListener('focus', () => { if (input.value.trim()) drawResults(); });
+input.addEventListener('keydown', e => {
+  if (results.hidden || !matches.length) return;
+  if (e.key === 'ArrowDown') { sel = (sel + 1) % matches.length; drawResults(); e.preventDefault(); }
+  if (e.key === 'ArrowUp') { sel = (sel - 1 + matches.length) % matches.length; drawResults(); e.preventDefault(); }
+  if (e.key === 'Enter') { openProfile(matches[sel].name.toLowerCase()); hideResults(); input.blur(); }
+});
+
+/* ---------- IP ---------- */
+$('ipValue').textContent = SERVER_IP;
+let toastTimer;
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+$('ipBox').addEventListener('click', () => {
+  const fallback = () => {
+    const r = document.createRange(); r.selectNodeContents($('ipValue'));
+    const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    toast('IP выделен — нажмите Ctrl+C');
+  };
+  try { navigator.clipboard.writeText(SERVER_IP).then(() => toast('IP скопирован!'), fallback); }
+  catch { fallback(); }
+});
+
+$('year').textContent = new Date().getFullYear();
+window.addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>
