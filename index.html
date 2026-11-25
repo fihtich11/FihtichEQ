@@ -285,7 +285,7 @@ button { font: inherit; color: inherit; }
 .titles small { color: var(--muted); font-variant-numeric: tabular-nums; }
 
 /* ===== Описание и справка ===== */
-.intro { color: var(--muted); font-size: .95rem; line-height: 1.55; margin-top: 22px; max-width: 70ch; }
+.intro { color: var(--muted); font-size: .95rem; line-height: 1.55; margin: 18px 0 20px; max-width: 70ch; }
 .secs { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-top: 28px; align-items: start; }
 .sec { padding: 22px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
 .sec h2 { font-size: 1.25rem; font-weight: 800; margin-bottom: 6px; }
@@ -310,6 +310,19 @@ button { font: inherit; color: inherit; }
 .lang { display: flex; padding: 3px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); }
 .lang button { border: 0; background: transparent; color: var(--muted); font-weight: 700; font-size: .8rem; padding: 7px 11px; border-radius: 9px; cursor: pointer; }
 .lang button.on { background: rgba(255,255,255,.12); color: var(--text); }
+
+.catbar { display: grid; grid-template-columns: 1fr auto 1fr; grid-template-areas: "l c r"; align-items: center; gap: 12px; margin-top: 18px; }
+.catbar .modes { margin: 0; }
+.cat { display: inline-flex; align-items: center; gap: 8px; padding: 11px 16px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); font-weight: 700; font-size: .95rem; cursor: pointer; white-space: nowrap; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: color .2s, background .2s, border-color .2s; }
+.cat[data-cat="kb2"] { justify-self: start; }
+.cat[data-cat="armor"] { justify-self: end; }
+.cat svg { width: 18px; height: 18px; }
+.cat:hover { color: var(--text); }
+.cat.active { color: var(--text); background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22); }
+@media (max-width: 900px) {
+  .catbar { grid-template-columns: 1fr 1fr; grid-template-areas: "l r" "c c"; }
+  .cat { justify-self: stretch !important; justify-content: center; }
+}
 
 /* ===== Футер ===== */
 .footer { margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--line); text-align: center; color: var(--muted); font-size: .85rem; }
@@ -380,8 +393,12 @@ button { font: inherit; color: inherit; }
 </header>
 
 <div class="wrap">
+  <div class="catbar">
+    <button class="cat" type="button" data-cat="kb2" style="grid-area:l"></button>
+    <nav class="modes" id="modes" role="tablist" style="grid-area:c"></nav>
+    <button class="cat" type="button" data-cat="armor" style="grid-area:r"></button>
+  </div>
   <p class="intro" id="intro">Тирлист игрока Fihtich — это список лучших игроков в PvP на сервере mc-zone.org. Игроки проходят испытания в игровых режимах, распределяются по уровням от 1 до 5 и попадают в общую таблицу лидеров.</p>
-  <nav class="modes" id="modes" role="tablist"></nav>
   <main id="content"></main>
 
   <footer class="footer">
@@ -389,6 +406,9 @@ button { font: inherit; color: inherit; }
     <div class="links">
       <a class="link-btn" href="https://t.me/Fihtich" target="_blank" rel="noopener"><i data-lucide="send"></i>Telegram: @Fihtich</a>
       <button class="link-btn" type="button" id="dsBtn" style="cursor:pointer" title="Скопировать Discord"><i data-lucide="message-circle"></i>Discord: @heldshot</button>
+    </div>
+    <div class="links" style="margin-top:12px">
+      <a class="link-btn" href="https://t.me/DomHeicera" target="_blank" rel="noopener"><i data-lucide="megaphone"></i><span id="tgkTxt"></span></a>
     </div>
   </footer>
 </div>
@@ -438,7 +458,8 @@ const MODES = [
       RHT2: ['Sait671616266262', 'Poludurok'],
       RLT2: ['mawe12345', 'ggtoporik', 'akki4ka', 'soobscurity', 'posedet', 'xpolner', 'murka1', 'CUBERENITET', 'truekoto', 'whalesk197767']
     }
-  }
+  },
+  { id: 'armor', title: { ru: 'Фулл Сеты', en: 'Full Sets' }, icon: 'shield', tiers: {} }
 ];
 
 /* =====================================================================
@@ -459,7 +480,7 @@ const I18N = {
     lvlH: 'Уровни и очки', lvlP: 'В каждом режиме игроки делятся на пять уровней, а каждый уровень — на высокий (HT) и низкий (LT). Очки за тиры суммируются и определяют место в таблице. Тир с приставкой R (RHT1, RLT1…) — ретайр: очки те же, но такие тиры учитываются в отдельном топе «Retired».',
     ttlH: 'Титулы', ttlP: 'Титул зависит от общей суммы очков, набранных во всех режимах.',
     rank: 'Место · всё время', points: 'Очки', byMode: 'Тиры по режимам', noTier: 'нет тира', notFound: 'Игрок не найден',
-    footer: 'Тирлист игрока Fihtich · PvP на сервере mc-zone.org', dsTitle: 'Скопировать Discord', dsCopied: 'Discord скопирован!'
+    footer: 'Тирлист игрока Fihtich · PvP на сервере mc-zone.org', soon: 'Тесты скоро начнутся', tgk: 'Telegram-канал: @DomHeicera', dsTitle: 'Скопировать Discord', dsCopied: 'Discord скопирован!'
   },
   en: {
     docTitle: "Fihtich's Tier List", search: 'Find a player…', ipTitle: 'Copy IP', ipCopied: 'IP copied!', ipSelect: 'IP selected — press Ctrl+C',
@@ -470,7 +491,7 @@ const I18N = {
     lvlH: 'Tiers and points', lvlP: 'In each mode players are split into five tiers, and each tier into High (HT) and Low (LT). Points for tiers add up and decide the leaderboard rank. A tier with the R prefix (RHT1, RLT1…) is retired: it gives the same points but is counted in the separate Retired top.',
     ttlH: 'Titles', ttlP: 'Your title depends on the total points earned across all modes.',
     rank: 'Rank · all-time', points: 'Points', byMode: 'Tiers by mode', noTier: 'no tier', notFound: 'Player not found',
-    footer: "Fihtich's tier list · PvP on mc-zone.org", dsTitle: 'Copy Discord', dsCopied: 'Discord copied!'
+    footer: "Fihtich's tier list · PvP on mc-zone.org", soon: "Testing starts soon", tgk: "Telegram channel: @DomHeicera", dsTitle: 'Copy Discord', dsCopied: 'Discord copied!'
   }
 };
 let lang = '';
@@ -503,16 +524,19 @@ const VIEWS = [
       e.act && e.ret ? (POINTS[e.ret] > POINTS[e.act] ? { tier: e.ret, retired: true } : { tier: e.act, retired: false })
       : e.act ? { tier: e.act, retired: false } : e.ret ? { tier: e.ret, retired: true } : null }
 ];
-const rankings = {};
-VIEWS.forEach(v => {
-  rankings[v.id] = [...players.values()].map(p => {
-    const modes = {};
-    Object.entries(p.src).forEach(([mid, e]) => { const m = v.pick(e); if (m) modes[mid] = m; });
-    const points = Object.values(modes).reduce((sum, m) => sum + POINTS[m.tier], 0);
-    return { name: p.name, modes, points, title: TITLES.find(t => points >= t.min) };
-  }).filter(p => Object.keys(p.modes).length)
-    .sort((x, y) => y.points - x.points || x.name.localeCompare(y.name))
-    .map((p, i) => ({ ...p, rank: i + 1 }));
+const rankings = {};   // rankings[категория][топ]
+MODES.forEach(mode => {
+  rankings[mode.id] = {};
+  VIEWS.forEach(v => {
+    rankings[mode.id][v.id] = [...players.values()].map(p => {
+      const modes = {}; let total = 0;
+      Object.entries(p.src).forEach(([mid, e]) => { const m = v.pick(e); if (m) { modes[mid] = m; total += POINTS[m.tier]; } });
+      const m = modes[mode.id];
+      return { name: p.name, modes, total, mode: m, points: m ? POINTS[m.tier] : 0, title: TITLES.find(t => total >= t.min) };
+    }).filter(p => p.mode)
+      .sort((x, y) => y.points - x.points || x.name.localeCompare(y.name))
+      .map((p, i) => ({ ...p, rank: i + 1 }));
+  });
 });
 
 // Пиксельная «голова» игрока, сгенерированная из ника
@@ -553,30 +577,38 @@ function chip(mode, m) {
 }
 const titleChip = t => `<span class="title-chip" style="--tc:${t.color}"><i data-lucide="${t.icon}"></i>${t.name[lang]}</span>`;
 
-/* ---------- Переключатель топов ---------- */
-let currentView = VIEWS[0];
+/* ---------- Категории и топы ---------- */
+let currentMode = MODES[0], currentView = VIEWS[0];
 VIEWS.forEach(v => {
   const btn = document.createElement('button');
   btn.className = 'mode'; btn.type = 'button'; btn.dataset.id = v.id;
   btn.setAttribute('role', 'tab');
   btn.innerHTML = `<span>${esc(tr('v_' + v.id))}</span>`;
-  btn.onclick = () => { location.hash = v.id; };
+  btn.onclick = () => { location.hash = currentMode.id + '/' + v.id; };
   $('modes').appendChild(btn);
+});
+document.querySelectorAll('.cat').forEach(btn => {
+  const m = MODES.find(x => x.id === btn.dataset.cat);
+  btn.innerHTML = `<i data-lucide="${m.icon}"></i><span></span>`;
+  btn.onclick = () => { location.hash = m.id + '/' + currentView.id; };
 });
 
 function route() {
-  currentView = VIEWS.find(v => v.id === location.hash.slice(1)) || VIEWS[0];
+  const [mid, vid] = location.hash.slice(1).split('/');
+  currentMode = MODES.find(x => x.id === mid) || MODES[0];
+  currentView = VIEWS.find(x => x.id === vid) || VIEWS[0];
   document.querySelectorAll('.mode').forEach(btn => {
     const on = btn.dataset.id === currentView.id;
     btn.classList.toggle('active', on); btn.setAttribute('aria-selected', on);
   });
+  document.querySelectorAll('.cat').forEach(btn => btn.classList.toggle('active', btn.dataset.cat === currentMode.id));
   $('content').innerHTML = renderBoard();
   window.lucide?.createIcons();
 }
 
 /* ---------- Таблица лидеров ---------- */
 function renderBoard() {
-  const list = rankings[currentView.id];
+  const list = rankings[currentMode.id][currentView.id];
   const rows = list.map((p, i) => `
     <button class="row row--${p.rank}" type="button" data-player="${esc(p.name.toLowerCase())}" style="animation-delay:${Math.min(i, 20) * 25}ms">
       <div class="rank">${p.rank}</div>
@@ -587,11 +619,11 @@ function renderBoard() {
           <div class="who__meta">${titleChip(p.title)}<span class="pts">${p.points} ${tr('pts')}</span></div>
         </div>
       </div>
-      <div class="chips">${MODES.map(m => chip(m, p.modes[m.id])).join('')}</div>
+      <div class="chips">${chip(currentMode, p.mode)}</div>
     </button>`).join('');
   return `<section class="view">
     <p class="view__sub" style="margin-bottom:12px">${list.length} ${tr('players')} · ${tr('s_' + currentView.id)}</p>
-    <div class="board">${rows || `<div class="empty-mode">${tr('emptyTop')}</div>`}</div>
+    <div class="board">${rows || `<div class="empty-mode">${tr(rankings[currentMode.id].all.length ? 'emptyTop' : 'soon')}</div>`}</div>
     ${infoBlocks()}
   </section>`;
 }
@@ -615,7 +647,7 @@ function infoBlocks() {
 
 /* ---------- Профиль игрока ---------- */
 function openProfile(id) {
-  const base = players.get(id), p = rankings.all.find(x => x.name.toLowerCase() === id);
+  const base = players.get(id), p = rankings[currentMode.id].all.find(x => x.name.toLowerCase() === id);
   if (!base || !p) return;
   const rows = MODES.map(m => {
     const e = base.src[m.id], best = p.modes[m.id];
@@ -632,7 +664,7 @@ function openProfile(id) {
     </div>
     <div class="card__stats">
       <div class="stat"><div class="stat__v">#${p.rank}</div><div class="stat__l">${tr('rank')}</div></div>
-      <div class="stat"><div class="stat__v">${p.points}</div><div class="stat__l">${tr('points')}</div></div>
+      <div class="stat"><div class="stat__v">${p.total}</div><div class="stat__l">${tr('points')}</div></div>
     </div>
     <div class="card__h">${tr('byMode')}</div>
     ${rows}`);
@@ -671,7 +703,7 @@ function drawResults() {
 input.addEventListener('input', () => {
   const q = input.value.trim().toLowerCase();
   if (!q) return hideResults();
-  matches = rankings.all.filter(p => p.name.toLowerCase().includes(q))
+  matches = rankings[currentMode.id].all.filter(p => p.name.toLowerCase().includes(q))
     .sort((a, b) => a.name.toLowerCase().indexOf(q) - b.name.toLowerCase().indexOf(q) || a.rank - b.rank)
     .slice(0, 8);
   sel = 0; drawResults();
@@ -712,7 +744,8 @@ function applyLang() {
   document.title = tr('docTitle');
   $('search').placeholder = tr('search'); $('search').setAttribute('aria-label', tr('search'));
   $('ipBox').title = tr('ipTitle'); $('dsBtn').title = tr('dsTitle');
-  $('intro').textContent = tr('intro'); $('ftxt').textContent = tr('footer');
+  $('intro').textContent = tr('intro'); $('tgkTxt').textContent = tr('tgk');
+  document.querySelectorAll('.cat').forEach(b => { b.querySelector('span').textContent = MODES.find(x => x.id === b.dataset.cat).title[lang]; }); $('ftxt').textContent = tr('footer');
   document.querySelectorAll('#lang button').forEach(b => b.classList.toggle('on', b.dataset.l === lang));
   document.querySelectorAll('.mode').forEach(b => { b.querySelector('span').textContent = tr('v_' + b.dataset.id); });
 }
