@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>mc-zone.Tiers</title>
+<title>Тирлист игрока Fihtich</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -359,7 +359,7 @@ button { font: inherit; color: inherit; }
   <div class="wrap topbar__inner">
     <a class="logo" href="#overall">
       <i data-lucide="swords"></i>
-      <span class="logo__title">mc-zone<span>.Tiers</span></span>
+      <span class="logo__title">Fihtich<span>.Tierlist</span></span>
     </a>
     <div class="search">
       <i data-lucide="search"></i>
@@ -375,16 +375,15 @@ button { font: inherit; color: inherit; }
 </header>
 
 <div class="wrap">
-  <p class="intro">McZone Tiers — это список лучших игроков в PvP на сервере mc-zone.org. Игроки проходят испытания в игровых режимах, распределяются по уровням от 1 до 5 и попадают в общую таблицу лидеров.</p>
+  <p class="intro">Тирлист игрока Fihtich — это список лучших игроков в PvP на сервере mc-zone.org. Игроки проходят испытания в игровых режимах, распределяются по уровням от 1 до 5 и попадают в общую таблицу лидеров.</p>
   <nav class="modes" id="modes" role="tablist"></nav>
   <main id="content"></main>
 
   <footer class="footer">
-    <div>© <span id="year"></span> mc-zone.Tiers · тир-лист сервера mc-zone.org от t1exyyy</div>
+    <div>© <span id="year"></span> Тирлист игрока Fihtich · PvP на сервере mc-zone.org</div>
     <div class="links">
-      <a class="link-btn" href="https://telegram.me/t1exyyy" target="_blank" rel="noopener"><i data-lucide="user"></i>t1exyyy</a>
-      <a class="link-btn" href="https://telegram.me/gemor_pvp" target="_blank" rel="noopener"><i data-lucide="megaphone"></i>Канал</a>
-      <a class="link-btn" href="https://telegram.me/gemor_pvpBot" target="_blank" rel="noopener"><i data-lucide="life-buoy"></i>Поддержка</a>
+      <a class="link-btn" href="https://t.me/Fihtich" target="_blank" rel="noopener"><i data-lucide="send"></i>Telegram: @Fihtich</a>
+      <button class="link-btn" type="button" id="dsBtn" style="cursor:pointer" title="Скопировать Discord"><i data-lucide="message-circle"></i>Discord: @heldshot</button>
     </div>
   </footer>
 </div>
@@ -672,6 +671,11 @@ $('ipBox').addEventListener('click', () => {
   };
   try { navigator.clipboard.writeText(SERVER_IP).then(() => toast('IP скопирован!'), fallback); }
   catch { fallback(); }
+});
+
+$('dsBtn').addEventListener('click', () => {
+  try { navigator.clipboard.writeText('heldshot').then(() => toast('Discord скопирован!'), () => toast('Discord: @heldshot')); }
+  catch { toast('Discord: @heldshot'); }
 });
 
 $('year').textContent = new Date().getFullYear();
