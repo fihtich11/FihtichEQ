@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Тирлист игрока Fihtich</title>
+<title>McZoneTiers</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -323,11 +323,6 @@ button { font: inherit; color: inherit; }
   .cat { justify-self: stretch !important; justify-content: center; }
 }
 
-.crown { display: flex; align-items: center; justify-content: center; gap: 12px; width: fit-content; max-width: calc(100% - 24px); margin: 12px auto 0; padding: 8px 16px 8px 10px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: relative; z-index: 5; }
-.crown__t { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
-.crown__t b { font-size: .95rem; }
-.crown__t span { font-size: .72rem; color: var(--muted); }
-
 /* ===== Футер ===== */
 .footer { margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--line); text-align: center; color: var(--muted); font-size: .85rem; }
 .links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 12px; }
@@ -374,7 +369,6 @@ button { font: inherit; color: inherit; }
 </style>
 </head>
 <body>
-<div class="crown" id="crown"></div>
 
 <div class="bg-glow bg-glow--1"></div>
 
@@ -382,7 +376,7 @@ button { font: inherit; color: inherit; }
   <div class="wrap topbar__inner">
     <a class="logo" href="#overall">
       <i data-lucide="swords"></i>
-      <span class="logo__title">Fihtich<span>.Tierlist</span></span>
+      <span class="logo__title">McZone<span>Tiers</span></span>
     </a>
     <div class="search">
       <i data-lucide="search"></i>
@@ -404,7 +398,7 @@ button { font: inherit; color: inherit; }
     <nav class="modes" id="modes" role="tablist" style="grid-area:c"></nav>
     <button class="cat" type="button" data-cat="armor" style="grid-area:r"></button>
   </div>
-  <p class="intro" id="intro">Тирлист игрока Fihtich — это список лучших игроков в PvP на сервере mc-zone.org. Игроки проходят испытания в игровых режимах, распределяются по уровням от 1 до 5 и попадают в общую таблицу лидеров.</p>
+  <p class="intro" id="intro">Тирлист игроков McZone — это список лучших игроков в PvP на сервере mc-zone.org. Игроки проходят испытания в игровых режимах, распределяются по уровням от 1 до 5 и попадают в общую таблицу лидеров.</p>
   <main id="content"></main>
 
   <footer class="footer">
@@ -495,26 +489,26 @@ const $ = id => document.getElementById(id);
 
 const I18N = {
   ru: {
-    docTitle: 'Тирлист игрока Fihtich', search: 'Найти игрока…', ipTitle: 'Скопировать IP', ipCopied: 'IP скопирован!', ipSelect: 'IP выделен — нажмите Ctrl+C',
-    intro: 'Тирлист игрока Fihtich — это список лучших игроков в PvP на сервере mc-zone.org. Игроки проходят испытания в игровых режимах, распределяются по уровням от 1 до 5 и попадают в общую таблицу лидеров.',
+    docTitle: 'McZoneTiers', search: 'Найти игрока…', ipTitle: 'Скопировать IP', ipCopied: 'IP скопирован!', ipSelect: 'IP выделен — нажмите Ctrl+C',
+    intro: 'Тирлист игроков McZone — это список лучших игроков в PvP на сервере mc-zone.org. Игроки проходят испытания в игровых режимах, распределяются по уровням от 1 до 5 и попадают в общую таблицу лидеров.',
     v_active: 'Актуальный', v_retired: 'Retired', v_all: 'За всё время',
     s_active: 'только действующие тиры', s_retired: 'ретайрнутые тиры', s_all: 'лучший тир в каждом режиме за всё время',
     players: 'игроков', pts: 'очк.', ptsLong: 'очков', ptsLess: 'Менее 10 очков', level: 'Уровень', emptyTop: 'В этом топе пока никого нет',
     lvlH: 'Уровни и очки', lvlP: 'В каждом режиме игроки делятся на пять уровней, а каждый уровень — на высокий (HT) и низкий (LT). Очки за тиры суммируются и определяют место в таблице. Тир с приставкой R (RHT1, RLT1…) — ретайр: очки те же, но такие тиры учитываются в отдельном топе «Retired».',
     ttlH: 'Титулы', ttlP: 'Титул зависит от общей суммы очков, набранных во всех режимах.',
     rank: 'Место · всё время', points: 'Очки', byMode: 'Тиры по режимам', noTier: 'нет тира', notFound: 'Игрок не найден',
-    footer: 'Тирлист игрока Fihtich · PvP на сервере mc-zone.org', crown: 'Доминация · самый слабый игрок с ноутбука', soon: 'Тесты скоро начнутся', tgk: 'Telegram-канал: @DomHeicera', dsTitle: 'Скопировать Discord', dsCopied: 'Discord скопирован!'
+    footer: 'McZoneTiers · PvP на сервере mc-zone.org', soon: 'Тесты скоро начнутся', tgk: 'Telegram-канал: @DomHeicera', dsTitle: 'Скопировать Discord', dsCopied: 'Discord скопирован!'
   },
   en: {
-    docTitle: "Fihtich's Tier List", search: 'Find a player…', ipTitle: 'Copy IP', ipCopied: 'IP copied!', ipSelect: 'IP selected — press Ctrl+C',
-    intro: "Fihtich's tier list ranks the best PvP players on the mc-zone.org server. Players are tested in game modes, placed into tiers 1 to 5 and listed on the overall leaderboard.",
+    docTitle: "McZoneTiers", search: 'Find a player…', ipTitle: 'Copy IP', ipCopied: 'IP copied!', ipSelect: 'IP selected — press Ctrl+C',
+    intro: "The McZone player tier list ranks the best PvP players on the mc-zone.org server. Players are tested in game modes, placed into tiers 1 to 5 and listed on the overall leaderboard.",
     v_active: 'Active', v_retired: 'Retired', v_all: 'All-time',
     s_active: 'current tiers only', s_retired: 'retired tiers', s_all: 'best tier in each mode, all time',
     players: 'players', pts: 'pts', ptsLong: 'points', ptsLess: 'Under 10 points', level: 'Tier', emptyTop: 'No players here yet',
     lvlH: 'Tiers and points', lvlP: 'In each mode players are split into five tiers, and each tier into High (HT) and Low (LT). Points for tiers add up and decide the leaderboard rank. A tier with the R prefix (RHT1, RLT1…) is retired: it gives the same points but is counted in the separate Retired top.',
     ttlH: 'Titles', ttlP: 'Your title depends on the total points earned across all modes.',
     rank: 'Rank · all-time', points: 'Points', byMode: 'Tiers by mode', noTier: 'no tier', notFound: 'Player not found',
-    footer: "Fihtich's tier list · PvP on mc-zone.org", crown: "Domination · weakest laptop player", soon: "Testing starts soon", tgk: "Telegram channel: @DomHeicera", dsTitle: 'Copy Discord', dsCopied: 'Discord copied!'
+    footer: "McZoneTiers · PvP on mc-zone.org", soon: "Testing starts soon", tgk: "Telegram channel: @DomHeicera", dsTitle: 'Copy Discord', dsCopied: 'Discord copied!'
   }
 };
 let lang = '';
@@ -763,7 +757,6 @@ $('dsBtn').addEventListener('click', () => {
 
 $('year').textContent = new Date().getFullYear();
 function applyLang() {
-  $('crown').innerHTML = `${ava('foxxy', 34)}<div class="crown__t"><b>foxxy - quweruh</b><span>${tr('crown')}</span></div>${chip(MODES[0], { tier: 'LT5', retired: false })}`;
   document.documentElement.lang = lang;
   document.title = tr('docTitle');
   $('search').placeholder = tr('search'); $('search').setAttribute('aria-label', tr('search'));
