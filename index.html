@@ -311,8 +311,8 @@ button { font: inherit; color: inherit; }
 .lang button { border: 0; background: transparent; color: var(--muted); font-weight: 700; font-size: .8rem; padding: 7px 11px; border-radius: 9px; cursor: pointer; }
 .lang button.on { background: rgba(255,255,255,.12); color: var(--text); }
 
-.catbar { display: grid; grid-template-columns: 1fr 1fr; grid-template-areas: "c c" "l r"; align-items: center; gap: 12px; margin-top: 18px; }
-.catbar .modes { margin: 0; width: 100%; max-width: 680px; justify-self: center; }
+.catbar { display: flex; justify-content: center; margin-top: 18px; }
+.catbar .modes { margin: 0; width: 100%; max-width: 460px; }
 .cat { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); font-weight: 700; font-size: .85rem; cursor: pointer; white-space: nowrap; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: color .2s, background .2s, border-color .2s; }
 .cat[data-cat="kb2"] { justify-self: start; }
 .cat[data-cat="armor"] { justify-self: end; }
@@ -322,6 +322,9 @@ button { font: inherit; color: inherit; }
 @media (max-width: 900px) {
   .cat { justify-self: stretch !important; justify-content: center; }
 }
+
+.chipc { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.chipc small { font-size: .66rem; font-weight: 600; color: var(--muted); line-height: 1; white-space: nowrap; }
 
 /* ===== Футер ===== */
 .footer { margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--line); text-align: center; color: var(--muted); font-size: .85rem; }
@@ -394,9 +397,7 @@ button { font: inherit; color: inherit; }
 
 <div class="wrap">
   <div class="catbar">
-    <button class="cat" type="button" data-cat="kb2" style="grid-area:l"></button>
-    <nav class="modes" id="modes" role="tablist" style="grid-area:c"></nav>
-    <button class="cat" type="button" data-cat="armor" style="grid-area:r"></button>
+    <nav class="modes" id="modes" role="tablist"></nav>
   </div>
   <p class="intro" id="intro">Тирлист игроков McZone — это список лучших игроков в PvP на сервере mc-zone.org. Игроки проходят испытания в игровых режимах, распределяются по уровням от 1 до 5 и попадают в общую таблицу лидеров.</p>
   <main id="content"></main>
@@ -496,8 +497,8 @@ const I18N = {
     players: 'игроков', pts: 'очк.', ptsLong: 'очков', ptsLess: 'Менее 10 очков', level: 'Уровень', emptyTop: 'В этом топе пока никого нет',
     lvlH: 'Уровни и очки', lvlP: 'В каждом режиме игроки делятся на пять уровней, а каждый уровень — на высокий (HT) и низкий (LT). Очки за тиры суммируются и определяют место в таблице. Тир с приставкой R (RHT1, RLT1…) — ретайр: очки те же, но такие тиры учитываются в отдельном топе «Retired».',
     ttlH: 'Титулы', ttlP: 'Титул зависит от общей суммы очков, набранных во всех режимах.',
-    rank: 'Место · всё время', points: 'Очки', byMode: 'Тиры по режимам', noTier: 'нет тира', notFound: 'Игрок не найден',
-    footer: 'McZoneTiers · PvP на сервере mc-zone.org', soon: 'Тесты скоро начнутся', tgk: 'Telegram-канал: @DomHeicera', dsTitle: 'Скопировать Discord', dsCopied: 'Discord скопирован!'
+    rank: 'Место', points: 'Очки', byMode: 'Тиры по режимам', noTier: 'нет тира', notFound: 'Игрок не найден',
+    footer: 'McZoneTiers · PvP на сервере mc-zone.org', cap_kb2: 'Палки', cap_armor: 'Фулл сеты', soon: 'Тесты скоро начнутся', tgk: 'Telegram-канал: @DomHeicera', dsTitle: 'Скопировать Discord', dsCopied: 'Discord скопирован!'
   },
   en: {
     docTitle: "McZoneTiers", search: 'Find a player…', ipTitle: 'Copy IP', ipCopied: 'IP copied!', ipSelect: 'IP selected — press Ctrl+C',
@@ -507,8 +508,8 @@ const I18N = {
     players: 'players', pts: 'pts', ptsLong: 'points', ptsLess: 'Under 10 points', level: 'Tier', emptyTop: 'No players here yet',
     lvlH: 'Tiers and points', lvlP: 'In each mode players are split into five tiers, and each tier into High (HT) and Low (LT). Points for tiers add up and decide the leaderboard rank. A tier with the R prefix (RHT1, RLT1…) is retired: it gives the same points but is counted in the separate Retired top.',
     ttlH: 'Titles', ttlP: 'Your title depends on the total points earned across all modes.',
-    rank: 'Rank · all-time', points: 'Points', byMode: 'Tiers by mode', noTier: 'no tier', notFound: 'Player not found',
-    footer: "McZoneTiers · PvP on mc-zone.org", soon: "Testing starts soon", tgk: "Telegram channel: @DomHeicera", dsTitle: 'Copy Discord', dsCopied: 'Discord copied!'
+    rank: 'Rank', points: 'Points', byMode: 'Tiers by mode', noTier: 'no tier', notFound: 'Player not found',
+    footer: "McZoneTiers · PvP on mc-zone.org", cap_kb2: "Sticks", cap_armor: "Full Sets", soon: "Testing starts soon", tgk: "Telegram channel: @DomHeicera", dsTitle: 'Copy Discord', dsCopied: 'Discord copied!'
   }
 };
 let lang = '';
@@ -536,25 +537,21 @@ MODES.forEach(mode => {
 // Три топа: действующие тиры / ретайр / всё время (лучший тир в каждом режиме)
 const VIEWS = [
   { id: 'active',  title: 'Актуальный',   sub: 'только действующие тиры', pick: e => e.act ? { tier: e.act, retired: false } : null },
-  { id: 'retired', title: 'Retired',      sub: 'ретайрнутые тиры', pick: e => e.ret ? { tier: e.ret, retired: true } : null },
-  { id: 'all',     title: 'За всё время', sub: 'лучший тир в каждом режиме за всё время', pick: e =>
-      e.act && e.ret ? (POINTS[e.ret] > POINTS[e.act] ? { tier: e.ret, retired: true } : { tier: e.act, retired: false })
-      : e.act ? { tier: e.act, retired: false } : e.ret ? { tier: e.ret, retired: true } : null }
+  { id: 'retired', title: 'Retired',      sub: 'ретайрнутые тиры', pick: e => e.ret ? { tier: e.ret, retired: true } : null }
 ];
-const rankings = {};   // rankings[категория][топ]
-MODES.forEach(mode => {
-  rankings[mode.id] = {};
-  VIEWS.forEach(v => {
-    rankings[mode.id][v.id] = [...players.values()].map(p => {
-      const modes = {}; let total = 0;
-      Object.entries(p.src).forEach(([mid, e]) => { const m = v.pick(e); if (m) { modes[mid] = m; total += POINTS[m.tier]; } });
-      const m = modes[mode.id];
-      return { name: p.name, modes, total, mode: m, points: m ? POINTS[m.tier] : 0, title: TITLES.find(t => total >= t.min) };
-    }).filter(p => p.mode)
-      .sort((x, y) => y.points - x.points || x.name.localeCompare(y.name))
-      .map((p, i) => ({ ...p, rank: i + 1 }));
-  });
+const rankings = {};   // rankings[топ] — сумма очков по обеим категориям
+VIEWS.forEach(v => {
+  rankings[v.id] = [...players.values()].map(p => {
+    const modes = {};
+    Object.entries(p.src).forEach(([mid, e]) => { const m = v.pick(e); if (m) modes[mid] = m; });
+    const points = Object.values(modes).reduce((sum, m) => sum + POINTS[m.tier], 0);
+    return { name: p.name, modes, points, title: TITLES.find(t => points >= t.min) };
+  }).filter(p => Object.keys(p.modes).length)
+    .sort((x, y) => y.points - x.points || x.name.localeCompare(y.name))
+    .map((p, i) => ({ ...p, rank: i + 1 }));
 });
+const findPlayer = id => rankings[currentView.id].find(x => x.name.toLowerCase() === id) || Object.values(rankings).flat().find(x => x.name.toLowerCase() === id);
+const searchPool = () => { const seen = new Set(); return Object.values(rankings).flat().filter(p => !seen.has(p.name) && seen.add(p.name)); };
 
 // Пиксельная «голова» игрока, сгенерированная из ника
 const avaCache = {};
@@ -594,38 +591,32 @@ function chip(mode, m) {
 }
 const titleChip = t => `<span class="title-chip" style="--tc:${t.color}"><i data-lucide="${t.icon}"></i>${t.name[lang]}</span>`;
 
-/* ---------- Категории и топы ---------- */
-let currentMode = MODES[0], currentView = VIEWS[0];
+/* ---------- Переключатель топов ---------- */
+let currentView = VIEWS[0];
 VIEWS.forEach(v => {
   const btn = document.createElement('button');
   btn.className = 'mode'; btn.type = 'button'; btn.dataset.id = v.id;
   btn.setAttribute('role', 'tab');
   btn.innerHTML = `<span>${esc(tr('v_' + v.id))}</span>`;
-  btn.onclick = () => { location.hash = currentMode.id + '/' + v.id; };
+  btn.onclick = () => { location.hash = v.id; };
   $('modes').appendChild(btn);
-});
-document.querySelectorAll('.cat').forEach(btn => {
-  const m = MODES.find(x => x.id === btn.dataset.cat);
-  btn.innerHTML = `<i data-lucide="${m.icon}"></i><span></span>`;
-  btn.onclick = () => { location.hash = m.id + '/' + currentView.id; };
 });
 
 function route() {
-  const [mid, vid] = location.hash.slice(1).split('/');
-  currentMode = MODES.find(x => x.id === mid) || MODES[0];
-  currentView = VIEWS.find(x => x.id === vid) || VIEWS[0];
+  currentView = VIEWS.find(x => x.id === location.hash.slice(1).split('/').pop()) || VIEWS[0];
   document.querySelectorAll('.mode').forEach(btn => {
     const on = btn.dataset.id === currentView.id;
     btn.classList.toggle('active', on); btn.setAttribute('aria-selected', on);
   });
-  document.querySelectorAll('.cat').forEach(btn => btn.classList.toggle('active', btn.dataset.cat === currentMode.id));
   $('content').innerHTML = renderBoard();
   window.lucide?.createIcons();
 }
 
+const capChip = (m, v) => `<div class="chipc"><small>${esc(tr('cap_' + m.id))}</small>${chip(m, v)}</div>`;
+
 /* ---------- Таблица лидеров ---------- */
 function renderBoard() {
-  const list = rankings[currentMode.id][currentView.id];
+  const list = rankings[currentView.id];
   const rows = list.map((p, i) => `
     <button class="row row--${p.rank}" type="button" data-player="${esc(p.name.toLowerCase())}" style="animation-delay:${Math.min(i, 20) * 25}ms">
       <div class="rank">${p.rank}</div>
@@ -636,11 +627,11 @@ function renderBoard() {
           <div class="who__meta">${titleChip(p.title)}<span class="pts">${p.points} ${tr('pts')}</span></div>
         </div>
       </div>
-      <div class="chips">${chip(currentMode, p.mode)}</div>
+      <div class="chips">${MODES.map(m => capChip(m, p.modes[m.id])).join('')}</div>
     </button>`).join('');
   return `<section class="view">
     <p class="view__sub" style="margin-bottom:12px">${list.length} ${tr('players')} · ${tr('s_' + currentView.id)}</p>
-    <div class="board">${rows || `<div class="empty-mode">${tr(rankings[currentMode.id].all.length ? 'emptyTop' : 'soon')}</div>`}</div>
+    <div class="board">${rows || `<div class="empty-mode">${tr('emptyTop')}</div>`}</div>
     ${infoBlocks()}
   </section>`;
 }
@@ -664,7 +655,7 @@ function infoBlocks() {
 
 /* ---------- Профиль игрока ---------- */
 function openProfile(id) {
-  const base = players.get(id), p = rankings[currentMode.id].all.find(x => x.name.toLowerCase() === id);
+  const base = players.get(id), p = findPlayer(id);
   if (!base || !p) return;
   const rows = MODES.map(m => {
     const e = base.src[m.id], best = p.modes[m.id];
@@ -681,7 +672,7 @@ function openProfile(id) {
     </div>
     <div class="card__stats">
       <div class="stat"><div class="stat__v">#${p.rank}</div><div class="stat__l">${tr('rank')}</div></div>
-      <div class="stat"><div class="stat__v">${p.total}</div><div class="stat__l">${tr('points')}</div></div>
+      <div class="stat"><div class="stat__v">${p.points}</div><div class="stat__l">${tr('points')}</div></div>
     </div>
     <div class="card__h">${tr('byMode')}</div>
     ${rows}`);
@@ -720,7 +711,7 @@ function drawResults() {
 input.addEventListener('input', () => {
   const q = input.value.trim().toLowerCase();
   if (!q) return hideResults();
-  matches = rankings[currentMode.id].all.filter(p => p.name.toLowerCase().includes(q))
+  matches = searchPool().filter(p => p.name.toLowerCase().includes(q))
     .sort((a, b) => a.name.toLowerCase().indexOf(q) - b.name.toLowerCase().indexOf(q) || a.rank - b.rank)
     .slice(0, 8);
   sel = 0; drawResults();
@@ -762,7 +753,6 @@ function applyLang() {
   $('search').placeholder = tr('search'); $('search').setAttribute('aria-label', tr('search'));
   $('ipBox').title = tr('ipTitle'); $('dsBtn').title = tr('dsTitle');
   $('intro').textContent = tr('intro'); $('tgkTxt').textContent = tr('tgk');
-  document.querySelectorAll('.cat').forEach(b => { b.querySelector('span').textContent = MODES.find(x => x.id === b.dataset.cat).title[lang]; }); $('ftxt').textContent = tr('footer');
   document.querySelectorAll('#lang button').forEach(b => b.classList.toggle('on', b.dataset.l === lang));
   document.querySelectorAll('.mode').forEach(b => { b.querySelector('span').textContent = tr('v_' + b.dataset.id); });
 }
