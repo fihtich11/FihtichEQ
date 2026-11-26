@@ -323,6 +323,11 @@ button { font: inherit; color: inherit; }
   .cat { justify-self: stretch !important; justify-content: center; }
 }
 
+.crown { display: flex; align-items: center; justify-content: center; gap: 12px; width: fit-content; max-width: calc(100% - 24px); margin: 12px auto 0; padding: 8px 16px 8px 10px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: relative; z-index: 5; }
+.crown__t { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.crown__t b { font-size: .95rem; }
+.crown__t span { font-size: .72rem; color: var(--muted); }
+
 /* ===== Футер ===== */
 .footer { margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--line); text-align: center; color: var(--muted); font-size: .85rem; }
 .links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 12px; }
@@ -369,6 +374,7 @@ button { font: inherit; color: inherit; }
 </style>
 </head>
 <body>
+<div class="crown" id="crown"></div>
 
 <div class="bg-glow bg-glow--1"></div>
 
@@ -497,7 +503,7 @@ const I18N = {
     lvlH: 'Уровни и очки', lvlP: 'В каждом режиме игроки делятся на пять уровней, а каждый уровень — на высокий (HT) и низкий (LT). Очки за тиры суммируются и определяют место в таблице. Тир с приставкой R (RHT1, RLT1…) — ретайр: очки те же, но такие тиры учитываются в отдельном топе «Retired».',
     ttlH: 'Титулы', ttlP: 'Титул зависит от общей суммы очков, набранных во всех режимах.',
     rank: 'Место · всё время', points: 'Очки', byMode: 'Тиры по режимам', noTier: 'нет тира', notFound: 'Игрок не найден',
-    footer: 'Тирлист игрока Fihtich · PvP на сервере mc-zone.org', soon: 'Тесты скоро начнутся', tgk: 'Telegram-канал: @DomHeicera', dsTitle: 'Скопировать Discord', dsCopied: 'Discord скопирован!'
+    footer: 'Тирлист игрока Fihtich · PvP на сервере mc-zone.org', crown: 'Доминация · самый слабый игрок с ноутбука', soon: 'Тесты скоро начнутся', tgk: 'Telegram-канал: @DomHeicera', dsTitle: 'Скопировать Discord', dsCopied: 'Discord скопирован!'
   },
   en: {
     docTitle: "Fihtich's Tier List", search: 'Find a player…', ipTitle: 'Copy IP', ipCopied: 'IP copied!', ipSelect: 'IP selected — press Ctrl+C',
@@ -508,7 +514,7 @@ const I18N = {
     lvlH: 'Tiers and points', lvlP: 'In each mode players are split into five tiers, and each tier into High (HT) and Low (LT). Points for tiers add up and decide the leaderboard rank. A tier with the R prefix (RHT1, RLT1…) is retired: it gives the same points but is counted in the separate Retired top.',
     ttlH: 'Titles', ttlP: 'Your title depends on the total points earned across all modes.',
     rank: 'Rank · all-time', points: 'Points', byMode: 'Tiers by mode', noTier: 'no tier', notFound: 'Player not found',
-    footer: "Fihtich's tier list · PvP on mc-zone.org", soon: "Testing starts soon", tgk: "Telegram channel: @DomHeicera", dsTitle: 'Copy Discord', dsCopied: 'Discord copied!'
+    footer: "Fihtich's tier list · PvP on mc-zone.org", crown: "Domination · weakest laptop player", soon: "Testing starts soon", tgk: "Telegram channel: @DomHeicera", dsTitle: 'Copy Discord', dsCopied: 'Discord copied!'
   }
 };
 let lang = '';
@@ -757,6 +763,7 @@ $('dsBtn').addEventListener('click', () => {
 
 $('year').textContent = new Date().getFullYear();
 function applyLang() {
+  $('crown').innerHTML = `${ava('foxxy', 34)}<div class="crown__t"><b>foxxy - quweruh</b><span>${tr('crown')}</span></div>${chip(MODES[0], { tier: 'LT5', retired: false })}`;
   document.documentElement.lang = lang;
   document.title = tr('docTitle');
   $('search').placeholder = tr('search'); $('search').setAttribute('aria-label', tr('search'));
